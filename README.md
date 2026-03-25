@@ -6,6 +6,18 @@ A pulsing circle lives in your menu bar. Click it for a larger view with a count
 
 ## install
 
+Download `Breathe-v1.0.0-macos.zip` from the [latest release](https://github.com/jcstein/breathe/releases/latest), unzip it, and move `Breathe.app` to your Applications folder.
+
+Then remove the quarantine flag (required since the app isn't code-signed):
+
+```bash
+xattr -cr ~/Downloads/Breathe.app
+```
+
+Open `Breathe.app` and you're good to go.
+
+### build from source
+
 ```bash
 git clone https://github.com/jcstein/breathe.git
 cd breathe
@@ -13,13 +25,11 @@ swift build -c release
 cp .build/release/Breathe /usr/local/bin/breathe
 ```
 
-Then run `breathe`.
-
 ### auto-launch on login
 
-System Settings → General → Login Items → "+" → Cmd+Shift+G → `/usr/local/bin/breathe` → Add.
+System Settings → General → Login Items → "+" → select Breathe from Applications.
 
 ## requirements
 
 - macOS 13+
-- Swift 5.9+
+- Apple Silicon (arm64)
