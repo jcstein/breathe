@@ -8,6 +8,7 @@ class StatusBarView: NSView {
     private var currentExpansion: Double = 0
 
     var onClick: (() -> Void)?
+    var onRightClick: (() -> Void)?
 
     init(engine: BreathEngine) {
         self.engine = engine
@@ -74,5 +75,9 @@ class StatusBarView: NSView {
 
     override func mouseDown(with event: NSEvent) {
         onClick?()
+    }
+
+    override func rightMouseDown(with event: NSEvent) {
+        onRightClick?()
     }
 }

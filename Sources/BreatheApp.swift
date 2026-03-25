@@ -22,6 +22,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let barView = StatusBarView(engine: engine)
         barView.onClick = { [weak self] in self?.togglePopover() }
+        barView.onRightClick = { [weak self] in self?.showMenu() }
         statusItem.button?.addSubview(barView)
         barView.frame = statusItem.button?.bounds ?? NSRect(x: 0, y: 0, width: 28, height: 22)
         barView.autoresizingMask = [.width, .height]
@@ -41,4 +42,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSApp.activate(ignoringOtherApps: true)
         }
     }
+
+    func showMenu() {
+        let menu = NSMenu()
+        let toggleTitle = engine.isBreathing ? "Pause" : "Start"
+        let toggleItem = NSMenuItem(title: toggleTitle, action: #selector(toggleBreathing), keyEquivalent: "")
+        toggleItem.target = self
+        menu.addItem(toggleItem)
+        menu.addItem(.separator())
+        let quitItem = NSMenuItem(title: "Quit Breathe", action: #selector(quitApp), keyEquivalent: "q")
+        quitItem.target = self
+        menu.addItem(quitItem)
+        statusItem.menu = menu
+        statusItem.button?.performClick(nil)
+        statusItem.menu = nil  // Reset so left-click opens popover again
+    }
+
+    @objc func toggleBreathing() { engine.toggle() }
+    @objc func quitApp() { NSApp.terminate(nil) }
 }

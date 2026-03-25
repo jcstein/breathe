@@ -1,4 +1,7 @@
 .build/
 .swiftpm/
 Breathe.app/
+Breathe.iconset/
+Breathe.icns
 *.zip
+generate_icon.swift
