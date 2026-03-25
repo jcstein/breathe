@@ -11,7 +11,7 @@ Download `Breathe-v1.0.0-macos.zip` from the [latest release](https://github.com
 Then remove the quarantine flag (required since the app isn't code-signed):
 
 ```bash
-xattr -cr ~/Downloads/Breathe.app
+xattr -cr /Applications/Breathe.app
 ```
 
 Open `Breathe.app` and you're good to go.
