@@ -6,7 +6,7 @@ A pulsing circle lives in your menu bar. Click it for a larger view with a count
 
 ## install
 
-Download `Breathe-v1.0.0-macos.zip` from the [latest release](https://github.com/jcstein/breathe/releases/latest), unzip it, and move `Breathe.app` to your Applications folder.
+Download `Breathe-v1.1.0-macos.zip` from the [latest release](https://github.com/jcstein/breathe/releases/latest), unzip it, and move `Breathe.app` to your Applications folder.
 
 Then remove the quarantine flag (required since the app isn't code-signed):
 
