@@ -67,7 +67,7 @@ struct BreathView: View {
             }
             .buttonStyle(.plain)
             .keyboardShortcut(.defaultAction)
-            .accessibilityLabel(engine.isBreathing ? "Pause" : "Start")
+            .accessibilityLabel(engine.isBreathing ? "End Session" : "Start")
 
             Text(engine.phase.rawValue)
                 .font(.system(size: 16, weight: .regular, design: .rounded))
