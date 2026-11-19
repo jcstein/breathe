@@ -18,6 +18,12 @@ class BreathEngine: ObservableObject {
     @Published var isBreathing: Bool = false
 
     private var timer: Timer?
+    private let now: () -> TimeInterval
+    private var sessionStart: TimeInterval?
+
+    init(now: @escaping () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }) {
+        self.now = now
+    }
 
     var phaseDuration: Double {
         phase == .inhale ? inhaleDuration : exhaleDuration
@@ -46,6 +52,7 @@ class BreathEngine: ObservableObject {
     }
 
     func start() {
+        sessionStart = now()
         isBreathing = true
         cycleCount = 0
         phase = .inhale
@@ -54,6 +61,7 @@ class BreathEngine: ObservableObject {
     }
 
     func stop() {
+        sessionStart = nil
         isBreathing = false
         phase = .idle
         elapsed = 0
@@ -66,17 +74,19 @@ class BreathEngine: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: tick, repeats: true) { [weak self] _ in
             guard let self else { return }
             DispatchQueue.main.async {
-                self.elapsed += self.tick
-                if self.elapsed >= self.phaseDuration {
-                    if self.phase == .inhale {
-                        self.phase = .exhale
-                    } else {
-                        self.cycleCount += 1
-                        self.phase = .inhale
-                    }
-                    self.elapsed = 0
-                }
+                self.update()
             }
         }
+    }
+
+    func update() {
+        guard isBreathing, let sessionStart else { return }
+        let sessionElapsed = max(now() - sessionStart, 0)
+        let cycleDuration = inhaleDuration + exhaleDuration
+        let cycleElapsed = sessionElapsed.truncatingRemainder(dividingBy: cycleDuration)
+        cycleCount = Int(sessionElapsed / cycleDuration)
+        let nextPhase: Phase = cycleElapsed < inhaleDuration ? .inhale : .exhale
+        if phase != nextPhase { phase = nextPhase }
+        elapsed = nextPhase == .inhale ? cycleElapsed : cycleElapsed - inhaleDuration
     }
 }
