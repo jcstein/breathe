@@ -15,7 +15,6 @@ class StatusBarView: NSView {
         super.init(frame: NSRect(x: 0, y: 0, width: 28, height: 22))
 
         engine.$elapsed
-            .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 self?.needsDisplay = true
             }
