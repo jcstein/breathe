@@ -4,8 +4,6 @@ import Combine
 class StatusBarView: NSView {
     private let engine: BreathEngine
     private var cancellables = Set<AnyCancellable>()
-    private var displayLink: CVDisplayLink?
-    private var currentExpansion: Double = 0
 
     var onClick: (() -> Void)?
     var onRightClick: (() -> Void)?
