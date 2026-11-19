@@ -35,6 +35,14 @@ swift build -c release
 cp .build/release/Breathe /usr/local/bin/breathe
 ```
 
+### package a release
+
+```bash
+./package.sh 1.2.0   # or, on a tagged commit: ./package.sh
+```
+
+This builds `Breathe-v1.2.0-macos.zip` containing `Breathe.app` with both bundle versions set to `1.2.0`, ready to upload as the release asset `install.sh` downloads. It refuses to package a version whose tag points at a different commit.
+
 ### auto-launch on login
 
 System Settings → General → Login Items → "+" → select Breathe from Applications.
