@@ -53,8 +53,13 @@ struct BreathView: View {
                             )
                         )
                         .frame(width: 150, height: 150)
+                        .opacity(engine.isBreathing ? circleOpacity * 0.4 : circleOpacity)
+                        .background {
+                            if engine.isBreathing {
+                                Circle().fill(Color(red: 0.14, green: 0.34, blue: 0.54))
+                            }
+                        }
                         .scaleEffect(circleScale)
-                        .opacity(circleOpacity)
 
                     if engine.isBreathing {
                         Text(String(format: "%.1f", engine.remaining))
