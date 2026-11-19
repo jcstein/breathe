@@ -28,7 +28,11 @@ ditto -x -k "$temp_dir/Breathe.zip" "$temp_dir/unpacked" \
 [ -d "$temp_dir/unpacked/Breathe.app" ] || die 'The release does not contain Breathe.app.'
 
 install_dir=/Applications
-if [ ! -w "$install_dir" ] || { [ -e "$install_dir/Breathe.app" ] && [ ! -w "$install_dir/Breathe.app" ]; }; then
+if { [ -e "$install_dir/Breathe.app" ] || [ -L "$install_dir/Breathe.app" ]; } && \
+    { [ ! -w "$install_dir" ] || [ ! -w "$install_dir/Breathe.app" ]; }; then
+    die 'Cannot replace /Applications/Breathe.app. Remove the old copy (sudo rm -rf /Applications/Breathe.app) and rerun this installer.'
+fi
+if [ ! -w "$install_dir" ]; then
     install_dir="$HOME/Applications"
     mkdir -p "$install_dir" || die 'Could not create ~/Applications.'
 fi
