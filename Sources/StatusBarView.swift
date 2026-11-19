@@ -74,7 +74,11 @@ class StatusBarView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
-        onClick?()
+        if event.modifierFlags.contains(.control) {
+            onRightClick?()
+        } else {
+            onClick?()
+        }
     }
 
     override func rightMouseDown(with event: NSEvent) {
