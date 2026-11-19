@@ -28,42 +28,46 @@ struct BreathView: View {
 
             Spacer()
 
-            ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [.accentColor.opacity(0.15), .clear],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 100
-                        )
-                    )
-                    .scaleEffect(circleScale * 1.3)
-
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [.accentColor.opacity(0.9), .accentColor.opacity(0.5)],
-                            center: .center,
-                            startRadius: 0,
-                            endRadius: 80
-                        )
-                    )
-                    .frame(width: 150, height: 150)
-                    .scaleEffect(circleScale)
-                    .opacity(circleOpacity)
-
-                if engine.isBreathing {
-                    Text(String(format: "%.1f", engine.remaining))
-                        .font(.system(size: 28, weight: .light, design: .rounded))
-                        .foregroundStyle(.white)
-                        .monospacedDigit()
-                }
-            }
-            .frame(width: 200, height: 200)
-            .onTapGesture {
+            Button {
                 engine.toggle()
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [.accentColor.opacity(0.15), .clear],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: 100
+                            )
+                        )
+                        .scaleEffect(circleScale * 1.3)
+
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [.accentColor.opacity(0.9), .accentColor.opacity(0.5)],
+                                center: .center,
+                                startRadius: 0,
+                                endRadius: 80
+                            )
+                        )
+                        .frame(width: 150, height: 150)
+                        .scaleEffect(circleScale)
+                        .opacity(circleOpacity)
+
+                    if engine.isBreathing {
+                        Text(String(format: "%.1f", engine.remaining))
+                            .font(.system(size: 28, weight: .light, design: .rounded))
+                            .foregroundStyle(.white)
+                            .monospacedDigit()
+                    }
+                }
+                .frame(width: 200, height: 200)
             }
+            .buttonStyle(.plain)
+            .keyboardShortcut(.defaultAction)
+            .accessibilityLabel(engine.isBreathing ? "End Session" : "Start")
 
             Text(engine.phase.rawValue)
                 .font(.system(size: 16, weight: .regular, design: .rounded))
