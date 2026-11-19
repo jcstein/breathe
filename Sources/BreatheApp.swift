@@ -19,8 +19,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
 
         statusItem = NSStatusBar.system.statusItem(withLength: 28)
+        statusItem.button?.target = self
+        statusItem.button?.action = #selector(togglePopover)
+        statusItem.button?.setAccessibilityLabel("Breathe")
 
         let barView = StatusBarView(engine: engine)
+        barView.setAccessibilityElement(false)
         barView.onClick = { [weak self] in self?.togglePopover() }
         barView.onRightClick = { [weak self] in self?.showMenu() }
         statusItem.button?.addSubview(barView)
@@ -33,13 +37,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover.contentViewController = NSHostingController(rootView: BreathView(engine: engine))
     }
 
-    func togglePopover() {
+    @objc func togglePopover() {
         guard let button = statusItem.button else { return }
         if popover.isShown {
             popover.performClose(nil)
         } else {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             NSApp.activate(ignoringOtherApps: true)
+            popover.contentViewController?.view.window?.makeKey()
         }
     }
 
