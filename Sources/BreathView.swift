@@ -94,6 +94,6 @@ struct BreathView: View {
             .padding(.horizontal, 4)
         }
         .padding(20)
-        .frame(width: 280, height: 340)
+        .frame(width: 280)
     }
 }
