@@ -10,7 +10,7 @@ struct BreatheApp: App {
     }
 }
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     var statusItem: NSStatusItem!
     var popover: NSPopover!
     let engine = BreathEngine()
@@ -32,6 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         barView.autoresizingMask = [.width, .height]
 
         popover = NSPopover()
+        popover.delegate = self
         popover.contentSize = NSSize(width: 280, height: 340)
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: BreathView(engine: engine))
@@ -43,9 +44,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             popover.performClose(nil)
         } else {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            button.highlight(true)
             NSApp.activate(ignoringOtherApps: true)
             popover.contentViewController?.view.window?.makeKey()
         }
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        statusItem.button?.highlight(false)
     }
 
     func showMenu() {
