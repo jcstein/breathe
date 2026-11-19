@@ -45,7 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showMenu() {
         let menu = NSMenu()
-        let toggleTitle = engine.isBreathing ? "Pause" : "Start"
+        let toggleTitle = engine.isBreathing ? "End Session" : "Start"
         let toggleItem = NSMenuItem(title: toggleTitle, action: #selector(toggleBreathing), keyEquivalent: "")
         toggleItem.target = self
         menu.addItem(toggleItem)
