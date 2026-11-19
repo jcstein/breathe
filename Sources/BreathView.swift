@@ -16,6 +16,10 @@ struct BreathView: View {
         0.4 + 0.5 * engine.expansion
     }
 
+    static func cycleCountLabel(_ count: Int) -> LocalizedStringResource {
+        count == 1 ? "1 cycle" : "\(count) cycles"
+    }
+
     var body: some View {
         VStack(spacing: 20) {
             HStack {
@@ -24,7 +28,7 @@ struct BreathView: View {
                     .foregroundStyle(.secondary)
                 Spacer()
                 if engine.isBreathing {
-                    Text("\(engine.cycleCount) cycles")
+                    Text(Self.cycleCountLabel(engine.cycleCount))
                         .font(.system(size: 12, weight: .regular, design: .rounded))
                         .foregroundStyle(.tertiary)
                 }
