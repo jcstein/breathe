@@ -33,9 +33,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
         popover = NSPopover()
         popover.delegate = self
-        popover.contentSize = NSSize(width: 280, height: 340)
         popover.behavior = .transient
-        popover.contentViewController = NSHostingController(rootView: BreathView(engine: engine))
+        let hostingController = NSHostingController(rootView: BreathView(engine: engine))
+        hostingController.sizingOptions = [.preferredContentSize]
+        popover.contentViewController = hostingController
     }
 
     @objc func togglePopover() {

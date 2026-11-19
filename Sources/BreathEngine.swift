@@ -71,12 +71,11 @@ class BreathEngine: ObservableObject {
 
     private func startTimer() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: tick, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            DispatchQueue.main.async {
-                self.update()
-            }
+        let timer = Timer(timeInterval: tick, repeats: true) { [weak self] _ in
+            self?.update()
         }
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
     }
 
     func update() {

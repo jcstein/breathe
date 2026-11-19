@@ -7,7 +7,8 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "Breathe",
-            path: "Sources"
+            path: "Sources",
+            exclude: ["Resources/AppIcon.icns"]
         ),
         .testTarget(name: "BreatheTests", dependencies: ["Breathe"])
     ]

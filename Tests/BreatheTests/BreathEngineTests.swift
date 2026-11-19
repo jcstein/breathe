@@ -1,7 +1,22 @@
 import XCTest
+import AppKit
 @testable import Breathe
 
 final class BreathEngineTests: XCTestCase {
+    func testTimerTicksDuringMenuTracking() {
+        _ = NSApplication.shared
+        let engine = BreathEngine()
+        engine.start()
+        defer { engine.stop() }
+
+        let deadline = Date(timeIntervalSinceNow: 0.25)
+        while Date() < deadline {
+            RunLoop.current.run(mode: .eventTracking, before: deadline)
+        }
+
+        XCTAssertGreaterThan(engine.elapsed, 0)
+    }
+
     func testIdleAndStoppedUpdatesDoNothing() {
         var time = 0.0
         let engine = BreathEngine(now: { time })
