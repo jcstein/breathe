@@ -1,7 +1,12 @@
 import SwiftUI
 
 struct BreathView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var engine: BreathEngine
+
+    private var countdownColor: Color {
+        colorScheme == .dark ? .white : Color(red: 0.05, green: 0.15, blue: 0.29)
+    }
 
     var circleScale: CGFloat {
         0.4 + 0.6 * engine.expansion
@@ -53,18 +58,13 @@ struct BreathView: View {
                             )
                         )
                         .frame(width: 150, height: 150)
-                        .opacity(engine.isBreathing ? circleOpacity * 0.4 : circleOpacity)
-                        .background {
-                            if engine.isBreathing {
-                                Circle().fill(Color(red: 0.14, green: 0.34, blue: 0.54))
-                            }
-                        }
                         .scaleEffect(circleScale)
+                        .opacity(circleOpacity)
 
                     if engine.isBreathing {
                         Text(String(format: "%.1f", engine.remaining))
                             .font(.system(size: 28, weight: .light, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(countdownColor)
                             .monospacedDigit()
                     }
                 }
