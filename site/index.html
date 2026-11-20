@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Breathe: a breathing pacer for your Mac menu bar</title>
+  <meta name="description" content="Breathe paces you at 5.5 seconds in and 5.5 seconds out from your Mac menu bar. One-time purchase, $4.99.">
+  <meta name="theme-color" content="#f4f7fc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1628" media="(prefers-color-scheme: dark)">
+  <meta property="og:title" content="Breathe for Mac">
+  <meta property="og:description" content="A breathing pacer that lives in your menu bar. 5.5 seconds in, 5.5 seconds out. $4.99, one time.">
+  <meta property="og:image" content="https://breathe.jcstein.dev/icon.png">
+  <meta property="og:url" content="https://breathe.jcstein.dev/">
+  <link rel="canonical" href="https://breathe.jcstein.dev/">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="./">
+      <img src="icon.png" alt="" width="28" height="28">
+      <span>breathe</span>
+    </a>
+    <a class="button button-small" href="#buy">Buy $4.99</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">For macOS</p>
+        <h1>Slow your breathing without leaving your work.</h1>
+        <p class="lede">Breathe is a pacer that lives in your menu bar. Click the dot, follow the circle: 5.5 seconds in, 5.5 seconds out, the resonant rate from James Nestor&rsquo;s <cite>Breath</cite>.</p>
+        <div class="cta">
+          <a class="button" href="#buy">Buy Breathe for $4.99</a>
+          <span class="cta-note">One-time purchase. No subscription.</span>
+        </div>
+      </div>
+
+      <figure class="pacer" aria-label="Breathe pacer demo: a circle that grows for 5.5 seconds, then shrinks for 5.5 seconds">
+        <div class="pacer-stage" aria-hidden="true">
+          <div class="pacer-glow"></div>
+          <div class="pacer-circle"></div>
+          <span class="pacer-count" data-count>5.5</span>
+        </div>
+        <figcaption aria-hidden="true">
+          <span class="pacer-phase" data-phase>breathe in</span>
+          <span class="pacer-rate">5.5s in &middot; 5.5s out</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="menubar-band">
+      <div class="menubar" aria-hidden="true">
+        <span class="menubar-app">Finder</span>
+        <span class="menubar-item">File</span>
+        <span class="menubar-item">Edit</span>
+        <span class="menubar-item">View</span>
+        <span class="menubar-spacer"></span>
+        <span class="menubar-dot"></span>
+        <span class="menubar-item">100%</span>
+        <span class="menubar-item">Thu 9:41</span>
+      </div>
+      <p>A small dot in the menu bar keeps the rhythm while you read, type or wait on a call. No Dock icon, no windows to manage.</p>
+    </section>
+
+    <section class="features" aria-label="Features">
+      <article>
+        <h2>One steady pace</h2>
+        <p>Every session runs at 5.5 seconds in and 5.5 seconds out, about five and a half breaths a minute. Nothing to set up.</p>
+      </article>
+      <article>
+        <h2>A countdown to follow</h2>
+        <p>Open the menu bar dot for a larger circle with a countdown for each breath and a count of the cycles you&rsquo;ve finished.</p>
+      </article>
+      <article>
+        <h2>Out of your way</h2>
+        <p>Click the circle to start, click again to stop. Close the popover and the dot keeps pulsing for the rest of the session.</p>
+      </article>
+    </section>
+
+    <section class="pricing" id="buy">
+      <div class="price-card">
+        <img src="icon.png" alt="Breathe app icon" width="72" height="72">
+        <h2>Breathe for Mac</h2>
+        <p class="price"><span class="price-amount">$4.99</span> <span class="price-term">one time</span></p>
+        <ul>
+          <li>The full app, yours to keep</li>
+          <li>No account and no subscription</li>
+          <li>macOS 13 or later on Apple Silicon</li>
+        </ul>
+        <a class="button button-wide is-pending" aria-disabled="true" role="link" data-checkout>Buy for $4.99</a>
+        <p class="price-note" data-checkout-note>Checkout opens soon.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>&copy; 2026 Josh Stein</span>
+  </footer>
+
+  <script src="pacer.js" defer></script>
+</body>
+</html>

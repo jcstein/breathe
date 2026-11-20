@@ -43,6 +43,16 @@ cp .build/release/Breathe /usr/local/bin/breathe
 
 This builds `Breathe-v1.2.0-macos.zip` containing `Breathe.app` with both bundle versions set to `1.2.0`, ready to upload as the release asset `install.sh` downloads. It refuses to package a version whose tag points at a different commit.
 
+### landing page
+
+`site/` is the static landing page for breathe.jcstein.dev (no build step). Preview it with `python3 -m http.server 8000 --directory site`, and publish it to Cloudflare Pages with:
+
+```bash
+npx wrangler pages deploy site --project-name breathe
+```
+
+The buy button stays disabled until the `data-checkout` link in `site/index.html` gets a checkout URL.
+
 ### auto-launch on login
 
 System Settings → General → Login Items → "+" → select Breathe from Applications.
