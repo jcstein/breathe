@@ -53,10 +53,10 @@ To package locally instead, run `./package.sh 1.2.0` (or `./package.sh` on a tag
 
 ### landing page
 
-`site/` is the static landing page for breathe.jcstein.dev (no build step). Preview it with `python3 -m http.server 8000 --directory site`, and publish it as the `breathe` Cloudflare Worker (custom domain breathe.jcstein.dev) with:
+`site/` is the static landing page for breathe.jcstein.dev (no build step). Preview it with `python3 -m http.server 8000 --directory site`, It is the `breathe` Cloudflare Worker (custom domain breathe.jcstein.dev), configured in `wrangler.jsonc`. Cloudflare Workers Builds deploys it whenever a change to `site/` or `wrangler.jsonc` lands on `main`; to deploy by hand, run:
 
 ```bash
-npx wrangler deploy --name breathe --assets site --compatibility-date 2025-11-01
+npx wrangler deploy
 ```
 
 The buy button is a disabled placeholder. To open checkout, edit the `data-checkout` link in `site/index.html`: add `href="<checkout URL>"`, remove `is-pending`, `aria-disabled` and `role`, and delete the `data-checkout-note` line.
