@@ -34,9 +34,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         popover = NSPopover()
         popover.delegate = self
         popover.behavior = .transient
-        let hostingController = NSHostingController(rootView: BreathView(engine: engine))
-        hostingController.sizingOptions = [.preferredContentSize]
-        popover.contentViewController = hostingController
     }
 
     @objc func togglePopover() {
@@ -44,6 +41,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         if popover.isShown {
             popover.performClose(nil)
         } else {
+            let hostingController = NSHostingController(rootView: BreathView(engine: engine))
+            hostingController.sizingOptions = [.preferredContentSize]
+            popover.contentViewController = hostingController
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             button.highlight(true)
             NSApp.activate(ignoringOtherApps: true)
@@ -53,6 +53,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
     func popoverDidClose(_ notification: Notification) {
         statusItem.button?.highlight(false)
+        // A hidden hosting view can still update its layout on every engine tick.
+        popover.contentViewController = nil
     }
 
     func showMenu() {
