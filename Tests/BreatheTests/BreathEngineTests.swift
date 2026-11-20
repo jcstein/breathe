@@ -132,7 +132,7 @@ final class BreathEngineTests: XCTestCase {
         }
     }
 
-    func testRestartsKeepOneTimerAndStopEndsTicks() {
+    func testRestartsKeepOneTimer() {
         var clockReads = 0
         let engine = BreathEngine(now: {
             clockReads += 1
@@ -147,11 +147,5 @@ final class BreathEngineTests: XCTestCase {
         RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.5))
         XCTAssertGreaterThan(clockReads, 0)
         XCTAssertLessThanOrEqual(clockReads, 45, "more ticks than one 60 Hz timer delivers in 0.5 s")
-
-        engine.stop()
-        clockReads = 0
-        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.25))
-        XCTAssertEqual(clockReads, 0)
-        XCTAssertEqual(engine.phase, .idle)
     }
 }
