@@ -37,13 +37,17 @@ swift build -c release
 cp .build/release/Breathe /usr/local/bin/breathe
 ```
 
-### package a release
+### publish a release
+
+Merged changes reach the installer only once they are released. Tag the commit on `main` and push the tag:
 
 ```bash
-./package.sh 1.2.0   # or, on a tagged commit: ./package.sh
+git tag v1.2.0 && git push origin v1.2.0
 ```
 
-This builds `Breathe-v1.2.0-macos.zip` containing `Breathe.app` with both bundle versions set to `1.2.0`, ready to upload as the release asset `install.sh` downloads. It refuses to package a version whose tag points at a different commit.
+The Release workflow runs the tests, packages `Breathe-v1.2.0-macos.zip` and publishes it as the latest GitHub release, which `install.sh` downloads.
+
+To package locally instead, run `./package.sh 1.2.0` (or `./package.sh` on a tagged commit). It builds the same ZIP with both bundle versions set to `1.2.0` and refuses to package a version whose tag points at a different commit.
 
 ### landing page
 
