@@ -20,7 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
         statusItem = NSStatusBar.system.statusItem(withLength: 28)
         statusItem.button?.target = self
-        statusItem.button?.action = #selector(togglePopover)
+        statusItem.button?.action = #selector(statusItemPressed)
         statusItem.button?.setAccessibilityLabel("Breathe")
 
         let barView = StatusBarView(engine: engine)
@@ -36,7 +36,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         popover.behavior = .transient
     }
 
-    @objc func togglePopover() {
+    /// VoiceOver presses arrive through `performClick`, which flashes the button in an
+    /// event-tracking run loop and then clears its highlight, so toggle once that is over.
+    @objc func statusItemPressed() {
+        RunLoop.main.perform(inModes: [.default]) { [weak self] in self?.togglePopover() }
+    }
+
+    func togglePopover() {
         guard let button = statusItem.button else { return }
         if popover.isShown {
             popover.performClose(nil)
