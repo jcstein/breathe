@@ -13,14 +13,14 @@ The larger view also shows minutes breathed today, sessions this week, and your 
 Run this in Terminal to install the latest release:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jcstein/breathe/main/install.sh | bash
+curl -fsSL https://breathe.jcstein.dev/install.sh | bash
 ```
 
 The installer quits Breathe if it is running and replaces it in `/Applications` (or `~/Applications` if `/Applications` isn't writable), without sudo. It prints the command to open the app when finished. The app is unsigned and not notarized; this method downloads it without the browser quarantine flag and removes that flag defensively, so no manual `xattr` command is needed. Only run scripts from sources you trust.
 
 ### manual download (alternative)
 
-Download the `-macos.zip` asset from the [latest release](https://github.com/jcstein/breathe/releases/latest), unzip it, and move `Breathe.app` to your Applications folder.
+Download the latest release from [breathe.jcstein.dev/download](https://breathe.jcstein.dev/download), unzip it, and move `Breathe.app` to your Applications folder.
 
 Then remove the quarantine flag (required since the app isn't code-signed):
 
@@ -47,13 +47,13 @@ Merged changes reach the installer only once they are released. Tag the commit o
 git tag v1.2.0 && git push origin v1.2.0
 ```
 
-The Release workflow runs the tests, packages `Breathe-v1.2.0-macos.zip` and publishes it as the latest GitHub release, which `install.sh` downloads.
+The Release workflow runs the tests, packages `Breathe-v1.2.0-macos.zip` and publishes it as the latest GitHub release. It also uploads the ZIP to the `breathe-releases` Workers KV namespace, which breathe.jcstein.dev/download serves and `site/install.sh` downloads. That step needs the repository secret `CLOUDFLARE_API_TOKEN`, a Cloudflare API token with Workers KV Storage Edit.
 
 To package locally instead, run `./package.sh 1.2.0` (or `./package.sh` on a tagged commit). It builds the same ZIP with both bundle versions set to `1.2.0` and refuses to package a version whose tag points at a different commit.
 
 ### landing page
 
-`site/` is the static landing page for breathe.jcstein.dev (no build step). Preview it with `python3 -m http.server 8000 --directory site`. It is the `breathe` Cloudflare Worker (custom domain breathe.jcstein.dev), configured in `wrangler.jsonc`. Cloudflare Workers Builds deploys it whenever a change to `site/` or `wrangler.jsonc` lands on `main`; to deploy by hand, run:
+`site/` is the static landing page for breathe.jcstein.dev (no build step). Preview it with `python3 -m http.server 8000 --directory site`. It is the `breathe` Cloudflare Worker (custom domain breathe.jcstein.dev), configured in `wrangler.jsonc`; `worker.js` serves `/download` from Workers KV and everything else from `site/`. Cloudflare Workers Builds deploys it whenever a change to `site/`, `worker.js` or `wrangler.jsonc` lands on `main`; to deploy by hand, run:
 
 ```bash
 npx wrangler deploy

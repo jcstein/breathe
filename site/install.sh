@@ -14,15 +14,10 @@ stage_dir=
 trap 'rm -rf "$temp_dir"; if [ -n "$stage_dir" ]; then rm -rf "$stage_dir"; fi' EXIT
 trap 'exit 1' HUP INT TERM
 
-printf 'Finding the latest Breathe release...\n'
-metadata=$(curl -fsSL https://api.github.com/repos/jcstein/breathe/releases/latest) \
-    || die 'Could not fetch the latest release from GitHub.'
-asset_url=$(printf '%s\n' "$metadata" | sed -n 's/.*"browser_download_url"[[:space:]]*:[[:space:]]*"\(https:\/\/[^"[:space:]]*-macos\.zip\)".*/\1/p' | head -n 1)
-[ -n "$asset_url" ] || die 'The latest release has no macOS zip asset.'
-
+asset_url=https://breathe.jcstein.dev/download
 printf 'Downloading %s...\n' "$asset_url"
 curl -fsSL "$asset_url" -o "$temp_dir/Breathe.zip" \
-    || die 'Could not download the Breathe release.'
+    || die 'Could not download the latest Breathe release.'
 ditto -x -k "$temp_dir/Breathe.zip" "$temp_dir/unpacked" \
     || die 'Could not extract the Breathe release.'
 [ -d "$temp_dir/unpacked/Breathe.app" ] || die 'The release does not contain Breathe.app.'

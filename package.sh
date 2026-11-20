@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds Breathe-v<version>-macos.zip, the release asset install.sh downloads.
+# Builds Breathe-v<version>-macos.zip, the release asset site/install.sh downloads.
 # Usage: ./package.sh [version]   e.g. ./package.sh 1.2.0 or ./package.sh v1.2.0
 # Without a version, uses the tag on HEAD.
 set -eu

@@ -38,3 +38,11 @@ jobs:
         run: >
           gh release create "$GITHUB_REF_NAME" "Breathe-$GITHUB_REF_NAME-macos.zip"
           --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
+      - name: Publish to breathe.jcstein.dev/download
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 7cd7c5099afe29e7bba04aa0fb64e070
+        run: >
+          npx --yes wrangler@4 kv key put Breathe-macos.zip --remote
+          --namespace-id 7282f6c3a32a4b8c88153b9ded83a4e1
+          --path "Breathe-$GITHUB_REF_NAME-macos.zip"
