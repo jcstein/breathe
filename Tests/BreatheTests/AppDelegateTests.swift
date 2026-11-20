@@ -49,6 +49,30 @@ final class AppDelegateTests: XCTestCase {
         XCTAssertFalse(button.isHighlighted)
     }
 
+    @MainActor
+    func testLockSleepAndUserSwitchEndTheSession() {
+        let workspaceCenter = NotificationCenter()
+        let distributedCenter = NotificationCenter()
+        let delegate = AppDelegate()
+        delegate.endSessionOnLockOrSleep(workspaceCenter: workspaceCenter, distributedCenter: distributedCenter)
+        var ended = 0
+        delegate.engine.onSessionEnd = { _ in ended += 1 }
+        defer { delegate.engine.stop() }
+
+        let events: [(NotificationCenter, Notification.Name)] = [
+            (distributedCenter, Notification.Name("com.apple.screenIsLocked")),
+            (workspaceCenter, NSWorkspace.willSleepNotification),
+            (workspaceCenter, NSWorkspace.sessionDidResignActiveNotification),
+        ]
+        for (index, (center, name)) in events.enumerated() {
+            delegate.engine.start()
+            center.post(name: name, object: nil)
+            XCTAssertFalse(delegate.engine.isBreathing, "\(name.rawValue) left the session running")
+            XCTAssertEqual(delegate.engine.phase, .idle)
+            XCTAssertEqual(ended, index + 1)
+        }
+    }
+
     private func runMainLoop(until condition: () -> Bool, timeout: TimeInterval = 2) {
         let deadline = Date().addingTimeInterval(timeout)
         while !condition() && Date() < deadline {
