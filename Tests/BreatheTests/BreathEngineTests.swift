@@ -31,6 +31,10 @@ final class BreathEngineTests: XCTestCase {
         XCTAssertEqual(reported, [62.5])
     }
 
+    func testIdlePromptSaysClick() {
+        XCTAssertEqual(BreathEngine.Phase.idle.rawValue, "click to begin")
+    }
+
     func testIdleAndStoppedUpdatesDoNothing() {
         var time = 0.0
         let engine = BreathEngine(now: { time })
