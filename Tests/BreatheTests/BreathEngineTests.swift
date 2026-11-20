@@ -72,4 +72,80 @@ final class BreathEngineTests: XCTestCase {
         XCTAssertEqual(engine.phase, .exhale)
         XCTAssertEqual(engine.elapsed, 0, accuracy: 0.000001)
     }
+
+    func testStopMidSessionReturnsToIdle() {
+        var time = 0.0
+        let engine = BreathEngine(now: { time })
+        engine.start()
+        time = 18
+        engine.update()
+        XCTAssertEqual(engine.phase, .exhale)
+        XCTAssertEqual(engine.cycleCount, 1)
+
+        engine.stop()
+        XCTAssertFalse(engine.isBreathing)
+        XCTAssertEqual(engine.phase, .idle)
+        XCTAssertEqual(engine.elapsed, 0)
+        XCTAssertEqual(engine.expansion, 0)
+    }
+
+    func testRestartAfterStopTimesFromRestart() {
+        var time = 0.0
+        let engine = BreathEngine(now: { time })
+        engine.start()
+        time = 30
+        engine.update()
+        XCTAssertEqual(engine.cycleCount, 2)
+        engine.stop()
+
+        time = 100
+        engine.start()
+        defer { engine.stop() }
+        XCTAssertTrue(engine.isBreathing)
+        XCTAssertEqual(engine.phase, .inhale)
+        XCTAssertEqual(engine.elapsed, 0)
+        XCTAssertEqual(engine.cycleCount, 0)
+        time = 103
+        engine.update()
+        XCTAssertEqual(engine.phase, .inhale)
+        XCTAssertEqual(engine.elapsed, 3)
+        XCTAssertEqual(engine.cycleCount, 0)
+        time = 112
+        engine.update()
+        XCTAssertEqual(engine.phase, .inhale)
+        XCTAssertEqual(engine.elapsed, 1)
+        XCTAssertEqual(engine.cycleCount, 1)
+    }
+
+    func testRepeatedTogglesAlternateSessions() {
+        var time = 0.0
+        let engine = BreathEngine(now: { time })
+        defer { engine.stop() }
+        for toggle in 1...10 {
+            time += 7
+            engine.toggle()
+            engine.update()
+            let started = toggle % 2 == 1
+            XCTAssertEqual(engine.isBreathing, started)
+            XCTAssertEqual(engine.phase, started ? .inhale : .idle)
+            XCTAssertEqual(engine.elapsed, 0)
+        }
+    }
+
+    func testRestartsKeepOneTimer() {
+        var clockReads = 0
+        let engine = BreathEngine(now: {
+            clockReads += 1
+            return ProcessInfo.processInfo.systemUptime
+        })
+        defer { engine.stop() }
+        for _ in 1...5 { engine.toggle() }
+        engine.start()
+        XCTAssertTrue(engine.isBreathing)
+
+        clockReads = 0
+        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.5))
+        XCTAssertGreaterThan(clockReads, 0)
+        XCTAssertLessThanOrEqual(clockReads, 45, "more ticks than one 60 Hz timer delivers in 0.5 s")
+    }
 }
