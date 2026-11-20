@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import Combine
 
 @main
 struct BreatheApp: App {
@@ -15,6 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     var popover: NSPopover!
     let engine = BreathEngine()
     let stats = UsageStats()
+    private var phaseSubscription: AnyCancellable?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -25,6 +27,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         statusItem.button?.target = self
         statusItem.button?.action = #selector(statusItemPressed)
         statusItem.button?.setAccessibilityLabel("Breathe")
+        phaseSubscription = engine.$phase
+            .removeDuplicates()
+            .sink { [weak self] phase in self?.updateStatusAccessibilityValue(for: phase) }
 
         let barView = StatusBarView(engine: engine)
         barView.setAccessibilityElement(false)
@@ -73,6 +78,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
     @objc private func endSession(_ notification: Notification) {
         engine.stop()
+    }
+
+    /// What VoiceOver reads after "Breathe" on the status item, so the session state is heard, not only seen.
+    static func statusAccessibilityValue(for phase: BreathEngine.Phase) -> String {
+        switch phase {
+        case .idle: return "idle"
+        case .inhale, .exhale: return phase.rawValue
+        }
+    }
+
+    private func updateStatusAccessibilityValue(for phase: BreathEngine.Phase) {
+        guard let button = statusItem.button else { return }
+        button.setAccessibilityValue(Self.statusAccessibilityValue(for: phase))
+        NSAccessibility.post(element: button, notification: .valueChanged)
     }
 
     func applicationWillTerminate(_ notification: Notification) {

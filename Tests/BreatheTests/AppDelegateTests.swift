@@ -73,6 +73,38 @@ final class AppDelegateTests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testStatusItemAccessibilityValueFollowsSessionPhase() throws {
+        let app = NSApplication.shared
+        let originalPolicy = app.activationPolicy()
+        defer { app.setActivationPolicy(originalPolicy) }
+
+        let delegate = AppDelegate()
+        delegate.applicationDidFinishLaunching(Notification(name: NSApplication.didFinishLaunchingNotification))
+        let statusItem = try XCTUnwrap(delegate.statusItem)
+        defer { NSStatusBar.system.removeStatusItem(statusItem) }
+        let button = try XCTUnwrap(statusItem.button)
+        defer { delegate.engine.stop() }
+
+        XCTAssertEqual(button.accessibilityLabel(), "Breathe")
+        XCTAssertEqual(button.accessibilityValue() as? String, "idle")
+
+        delegate.engine.start()
+        XCTAssertEqual(button.accessibilityValue() as? String, "breathe in")
+
+        delegate.engine.phase = .exhale
+        XCTAssertEqual(button.accessibilityValue() as? String, "breathe out")
+
+        delegate.engine.stop()
+        XCTAssertEqual(button.accessibilityValue() as? String, "idle")
+
+        let distributedCenter = NotificationCenter()
+        delegate.endSessionOnLockOrSleep(workspaceCenter: NotificationCenter(), distributedCenter: distributedCenter)
+        delegate.engine.start()
+        distributedCenter.post(name: Notification.Name("com.apple.screenIsLocked"), object: nil)
+        XCTAssertEqual(button.accessibilityValue() as? String, "idle", "locking the Mac left VoiceOver on the old phase")
+    }
+
     private func runMainLoop(until condition: () -> Bool, timeout: TimeInterval = 2) {
         let deadline = Date().addingTimeInterval(timeout)
         while !condition() && Date() < deadline {
