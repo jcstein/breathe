@@ -17,7 +17,7 @@ final class UsageStats: ObservableObject {
     private let now: () -> Date
     private static let storageKey = "usageDays"
 
-    init(defaults: UserDefaults = .standard, calendar: Calendar = .current, now: @escaping () -> Date = Date.init) {
+    init(defaults: UserDefaults = .standard, calendar: Calendar = .autoupdatingCurrent, now: @escaping () -> Date = Date.init) {
         self.defaults = defaults
         self.calendar = calendar
         self.now = now
