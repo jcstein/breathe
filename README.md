@@ -4,6 +4,8 @@ A macOS menu bar breathing pacer. 5.5s inhale, 5.5s exhale — the resonant brea
 
 A pulsing circle lives in your menu bar. Click it for a larger view with a countdown timer.
 
+The larger view also shows minutes breathed today, sessions this week, and your daily streak. They are stored only on your Mac: no account, no network.
+
 ## install
 
 Run this in Terminal to install the latest release:

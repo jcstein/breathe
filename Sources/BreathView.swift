@@ -3,6 +3,7 @@ import SwiftUI
 struct BreathView: View {
     @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var engine: BreathEngine
+    @ObservedObject var stats: UsageStats
 
     private var countdownColor: Color {
         colorScheme == .dark ? .white : Color(red: 0.05, green: 0.15, blue: 0.29)
@@ -18,6 +19,32 @@ struct BreathView: View {
 
     static func cycleCountLabel(_ count: Int) -> LocalizedStringResource {
         count == 1 ? "1 cycle" : "\(count) cycles"
+    }
+
+    static func minutesLabel(_ count: Int) -> LocalizedStringResource {
+        "\(count) min"
+    }
+
+    static func sessionsLabel(_ count: Int) -> LocalizedStringResource {
+        count == 1 ? "1 session" : "\(count) sessions"
+    }
+
+    static func streakLabel(_ count: Int) -> LocalizedStringResource {
+        count == 1 ? "1 day" : "\(count) days"
+    }
+
+    private func statColumn(_ value: LocalizedStringResource, _ caption: LocalizedStringResource) -> some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+            Text(caption)
+                .font(.system(size: 10, weight: .regular, design: .rounded))
+                .foregroundStyle(.tertiary)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
     }
 
     var body: some View {
@@ -87,6 +114,12 @@ struct BreathView: View {
                 .foregroundStyle(.tertiary)
 
             Spacer()
+
+            HStack(spacing: 0) {
+                statColumn(Self.minutesLabel(stats.minutesToday), "today")
+                statColumn(Self.sessionsLabel(stats.sessionsThisWeek), "this week")
+                statColumn(Self.streakLabel(stats.streakDays), "streak")
+            }
 
             HStack {
                 Spacer()
