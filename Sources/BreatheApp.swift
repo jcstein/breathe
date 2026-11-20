@@ -19,6 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         engine.onSessionEnd = { [stats] in stats.record(sessionDuration: $0) }
+        endSessionOnLockOrSleep()
 
         statusItem = NSStatusBar.system.statusItem(withLength: 28)
         statusItem.button?.target = self
@@ -59,6 +60,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         }
     }
 
+    /// Locking, sleeping or switching away from the Mac ends the session, so time away is not counted.
+    func endSessionOnLockOrSleep(
+        workspaceCenter: NotificationCenter = NSWorkspace.shared.notificationCenter,
+        distributedCenter: NotificationCenter = DistributedNotificationCenter.default()
+    ) {
+        for name in [NSWorkspace.willSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
+            workspaceCenter.addObserver(self, selector: #selector(endSession), name: name, object: nil)
+        }
+        distributedCenter.addObserver(self, selector: #selector(endSession), name: .screenIsLocked, object: nil)
+    }
+
+    @objc private func endSession(_ notification: Notification) {
+        engine.stop()
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         engine.stop()
     }
@@ -86,4 +102,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
 
     @objc func toggleBreathing() { engine.toggle() }
     @objc func quitApp() { NSApp.terminate(nil) }
+}
+
+private extension Notification.Name {
+    static let screenIsLocked = Notification.Name("com.apple.screenIsLocked")
 }
