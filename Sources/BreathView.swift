@@ -47,6 +47,29 @@ struct BreathView: View {
         .accessibilityElement(children: .combine)
     }
 
+    private var patternPicker: some View {
+        HStack(spacing: 2) {
+            ForEach(BreathEngine.Pattern.allCases) { pattern in
+                let isSelected = engine.pattern == pattern
+                Button {
+                    engine.pattern = pattern
+                } label: {
+                    Text(pattern.rawValue)
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(isSelected ? .secondary : .tertiary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill(.primary.opacity(isSelected ? 0.08 : 0)))
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Breathing pattern")
+    }
+
     var body: some View {
         VStack(spacing: 20) {
             HStack {
@@ -105,13 +128,16 @@ struct BreathView: View {
             .keyboardShortcut(.defaultAction)
             .accessibilityLabel(engine.isBreathing ? "End Session" : "Start")
 
-            Text(engine.phase.rawValue)
+            Text(engine.phase.label)
                 .font(.system(size: 16, weight: .regular, design: .rounded))
                 .foregroundStyle(engine.isBreathing ? .primary : .secondary)
 
-            Text("5.5s in \u{00B7} 5.5s out")
+            Text(engine.pattern.summary)
                 .font(.system(size: 11, weight: .regular, design: .rounded))
                 .foregroundStyle(.tertiary)
+
+            patternPicker
+                .disabled(engine.isBreathing)
 
             Spacer()
 

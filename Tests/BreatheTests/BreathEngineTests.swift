@@ -32,7 +32,7 @@ final class BreathEngineTests: XCTestCase {
     }
 
     func testIdlePromptSaysClick() {
-        XCTAssertEqual(BreathEngine.Phase.idle.rawValue, "click to begin")
+        XCTAssertEqual(BreathEngine.Phase.idle.label, "click to begin")
     }
 
     func testIdleAndStoppedUpdatesDoNothing() {
@@ -165,5 +165,56 @@ final class BreathEngineTests: XCTestCase {
         RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.5))
         XCTAssertGreaterThan(clockReads, 0)
         XCTAssertLessThanOrEqual(clockReads, 45, "more ticks than one 60 Hz timer delivers in 0.5 s")
+    }
+
+    func testBoxPatternHoldsAfterEachBreath() {
+        let suiteName = "BreathEngineTests-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        var time = 0.0
+        let engine = BreathEngine(defaults: defaults, now: { time })
+        engine.pattern = .box
+        engine.start()
+        defer { engine.stop() }
+
+        let expected: [(time: Double, phase: BreathEngine.Phase, remaining: Double, expansion: Double, cycles: Int)] = [
+            (1, .inhale, 3, 0.25, 0),
+            (5, .holdFull, 3, 1, 0),
+            (10, .exhale, 2, 0.5, 0),
+            (13, .holdEmpty, 3, 0, 0),
+            (16, .inhale, 4, 0, 1),
+            (47.5, .holdEmpty, 0.5, 0, 2),
+        ]
+        for step in expected {
+            time = step.time
+            engine.update()
+            XCTAssertEqual(engine.phase, step.phase, "at \(step.time) s")
+            XCTAssertEqual(engine.remaining, step.remaining, accuracy: 0.000001, "at \(step.time) s")
+            XCTAssertEqual(engine.expansion, step.expansion, accuracy: 0.000001, "at \(step.time) s")
+            XCTAssertEqual(engine.cycleCount, step.cycles, "at \(step.time) s")
+        }
+        XCTAssertEqual(BreathEngine.Phase.holdFull.label, "hold")
+        XCTAssertEqual(BreathEngine.Phase.holdEmpty.label, "hold")
+    }
+
+    func testPatternChoiceIsRememberedAndDefaultsToResonant() {
+        let suiteName = "BreathEngineTests-\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let first = BreathEngine(defaults: defaults)
+        XCTAssertEqual(first.pattern, .resonant)
+        first.pattern = .box
+        XCTAssertEqual(BreathEngine(defaults: defaults).pattern, .box)
+
+        defaults.set("unknown", forKey: "breathPattern")
+        XCTAssertEqual(BreathEngine(defaults: defaults).pattern, .resonant)
+    }
+
+    func testPatternSummaries() {
+        XCTAssertEqual(BreathEngine.Pattern.resonant.summary, "5.5s in \u{00B7} 5.5s out")
+        XCTAssertEqual(BreathEngine.Pattern.box.summary, "4s in \u{00B7} 4s hold \u{00B7} 4s out \u{00B7} 4s hold")
+        XCTAssertEqual(BreathEngine.Pattern.resonant.cycleDuration, 11)
+        XCTAssertEqual(BreathEngine.Pattern.box.cycleDuration, 16)
     }
 }
