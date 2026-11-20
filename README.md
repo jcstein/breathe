@@ -45,10 +45,10 @@ This builds `Breathe-v1.2.0-macos.zip` containing `Breathe.app` with both bundle
 
 ### landing page
 
-`site/` is the static landing page for breathe.jcstein.dev (no build step). Preview it with `python3 -m http.server 8000 --directory site`, and publish it to Cloudflare Pages with:
+`site/` is the static landing page for breathe.jcstein.dev (no build step). Preview it with `python3 -m http.server 8000 --directory site`, and publish it as the `breathe` Cloudflare Worker (custom domain breathe.jcstein.dev) with:
 
 ```bash
-npx wrangler pages deploy site --project-name breathe
+npx wrangler deploy --name breathe --assets site --compatibility-date 2025-11-01
 ```
 
 The buy button is a disabled placeholder. To open checkout, edit the `data-checkout` link in `site/index.html`: add `href="<checkout URL>"`, remove `is-pending`, `aria-disabled` and `role`, and delete the `data-checkout-note` line.
