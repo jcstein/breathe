@@ -3,7 +3,7 @@ import Combine
 
 class BreathEngine: ObservableObject {
     enum Phase: String {
-        case idle = "tap to begin"
+        case idle = "click to begin"
         case inhale = "breathe in"
         case exhale = "breathe out"
     }
