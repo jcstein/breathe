@@ -53,7 +53,7 @@ To package locally instead, run `./package.sh 1.2.0` (or `./package.sh` on a tag
 
 ### landing page
 
-`site/` is the static landing page for breathe.jcstein.dev (no build step). Preview it with `python3 -m http.server 8000 --directory site`, It is the `breathe` Cloudflare Worker (custom domain breathe.jcstein.dev), configured in `wrangler.jsonc`. Cloudflare Workers Builds deploys it whenever a change to `site/` or `wrangler.jsonc` lands on `main`; to deploy by hand, run:
+`site/` is the static landing page for breathe.jcstein.dev (no build step). Preview it with `python3 -m http.server 8000 --directory site`. It is the `breathe` Cloudflare Worker (custom domain breathe.jcstein.dev), configured in `wrangler.jsonc`. Cloudflare Workers Builds deploys it whenever a change to `site/` or `wrangler.jsonc` lands on `main`; to deploy by hand, run:
 
 ```bash
 npx wrangler deploy
