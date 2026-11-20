@@ -84,7 +84,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     static func statusAccessibilityValue(for phase: BreathEngine.Phase) -> String {
         switch phase {
         case .idle: return "idle"
-        case .inhale, .exhale: return phase.rawValue
+        case .inhale, .holdFull, .exhale, .holdEmpty: return phase.label
         }
     }
 

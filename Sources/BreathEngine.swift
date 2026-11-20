@@ -2,16 +2,59 @@ import Foundation
 import Combine
 
 class BreathEngine: ObservableObject {
-    enum Phase: String {
-        case idle = "click to begin"
-        case inhale = "breathe in"
-        case exhale = "breathe out"
+    enum Phase {
+        case idle, inhale, holdFull, exhale, holdEmpty
+
+        var label: String {
+            switch self {
+            case .idle: return "click to begin"
+            case .inhale: return "breathe in"
+            case .holdFull, .holdEmpty: return "hold"
+            case .exhale: return "breathe out"
+            }
+        }
+
+        fileprivate var shortLabel: String {
+            switch self {
+            case .idle: return ""
+            case .inhale: return "in"
+            case .holdFull, .holdEmpty: return "hold"
+            case .exhale: return "out"
+            }
+        }
     }
 
-    let inhaleDuration: Double = 5.5
-    let exhaleDuration: Double = 5.5
+    enum Pattern: String, CaseIterable, Identifiable {
+        /// 5.5 s in, 5.5 s out: the resonant rate from James Nestor's *Breath*.
+        case resonant
+        /// 4 s in, hold, out, hold.
+        case box
+
+        var id: Self { self }
+
+        var steps: [(phase: Phase, duration: Double)] {
+            switch self {
+            case .resonant: return [(.inhale, 5.5), (.exhale, 5.5)]
+            case .box: return [(.inhale, 4), (.holdFull, 4), (.exhale, 4), (.holdEmpty, 4)]
+            }
+        }
+
+        var cycleDuration: Double {
+            steps.reduce(0) { $0 + $1.duration }
+        }
+
+        /// The timings shown under the circle, e.g. "5.5s in · 5.5s out".
+        var summary: String {
+            steps.map { "\($0.duration.formatted())s \($0.phase.shortLabel)" }.joined(separator: " \u{00B7} ")
+        }
+    }
+
     private let tick: Double = 1.0 / 60.0
 
+    /// The pattern the next session follows, remembered across launches.
+    @Published var pattern: Pattern {
+        didSet { defaults.set(pattern.rawValue, forKey: Self.patternKey) }
+    }
     @Published var phase: Phase = .idle
     @Published var elapsed: Double = 0
     @Published var cycleCount: Int = 0
@@ -23,13 +66,17 @@ class BreathEngine: ObservableObject {
     private var timer: Timer?
     private let now: () -> TimeInterval
     private var sessionStart: TimeInterval?
+    private let defaults: UserDefaults
+    private static let patternKey = "breathPattern"
 
-    init(now: @escaping () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }) {
+    init(defaults: UserDefaults = .standard, now: @escaping () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }) {
+        self.defaults = defaults
         self.now = now
+        pattern = defaults.string(forKey: Self.patternKey).flatMap(Pattern.init) ?? .resonant
     }
 
     var phaseDuration: Double {
-        phase == .inhale ? inhaleDuration : exhaleDuration
+        pattern.steps.first { $0.phase == phase }?.duration ?? 0
     }
 
     var progress: Double {
@@ -46,7 +93,9 @@ class BreathEngine: ObservableObject {
         switch phase {
         case .idle: return 0
         case .inhale: return progress
+        case .holdFull: return 1
         case .exhale: return 1.0 - progress
+        case .holdEmpty: return 0
         }
     }
 
@@ -58,7 +107,7 @@ class BreathEngine: ObservableObject {
         sessionStart = now()
         isBreathing = true
         cycleCount = 0
-        phase = .inhale
+        phase = pattern.steps[0].phase
         elapsed = 0
         startTimer()
     }
@@ -85,11 +134,16 @@ class BreathEngine: ObservableObject {
     func update() {
         guard isBreathing, let sessionStart else { return }
         let sessionElapsed = max(now() - sessionStart, 0)
-        let cycleDuration = inhaleDuration + exhaleDuration
-        let cycleElapsed = sessionElapsed.truncatingRemainder(dividingBy: cycleDuration)
-        cycleCount = Int(sessionElapsed / cycleDuration)
-        let nextPhase: Phase = cycleElapsed < inhaleDuration ? .inhale : .exhale
-        if phase != nextPhase { phase = nextPhase }
-        elapsed = nextPhase == .inhale ? cycleElapsed : cycleElapsed - inhaleDuration
+        let steps = pattern.steps
+        let cycleElapsed = sessionElapsed.truncatingRemainder(dividingBy: pattern.cycleDuration)
+        cycleCount = Int(sessionElapsed / pattern.cycleDuration)
+        var index = 0
+        var stepStart = 0.0
+        while index < steps.count - 1, cycleElapsed >= stepStart + steps[index].duration {
+            stepStart += steps[index].duration
+            index += 1
+        }
+        if phase != steps[index].phase { phase = steps[index].phase }
+        elapsed = cycleElapsed - stepStart
     }
 }

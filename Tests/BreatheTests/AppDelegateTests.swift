@@ -92,6 +92,9 @@ final class AppDelegateTests: XCTestCase {
         delegate.engine.start()
         XCTAssertEqual(button.accessibilityValue() as? String, "breathe in")
 
+        delegate.engine.phase = .holdFull
+        XCTAssertEqual(button.accessibilityValue() as? String, "hold")
+
         delegate.engine.phase = .exhale
         XCTAssertEqual(button.accessibilityValue() as? String, "breathe out")
 
