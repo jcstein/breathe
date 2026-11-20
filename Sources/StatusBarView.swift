@@ -30,8 +30,8 @@ class StatusBarView: NSView {
         let centerX = bounds.midX
         let centerY = bounds.midY
 
-        // Use white to match other menu bar icons
-        let iconColor = NSColor.white
+        // Resolves against the menu bar appearance, like template icons
+        let iconColor = NSColor.labelColor
 
         if engine.isBreathing {
             let minRadius: CGFloat = 3.5

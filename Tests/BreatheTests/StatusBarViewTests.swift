@@ -29,4 +29,18 @@ final class StatusBarViewTests: XCTestCase {
             XCTAssertEqual(menus, expectedMenus)
         }
     }
+
+    func testDotFollowsMenuBarAppearance() throws {
+        for (name, expectsDarkDot): (NSAppearance.Name, Bool) in [(.aqua, true), (.darkAqua, false)] {
+            let view = StatusBarView(engine: BreathEngine())
+            view.appearance = NSAppearance(named: name)
+            let bitmap = try XCTUnwrap(view.bitmapImageRepForCachingDisplay(in: view.bounds))
+            view.cacheDisplay(in: view.bounds, to: bitmap)
+
+            let center = try XCTUnwrap(bitmap.colorAt(x: bitmap.pixelsWide / 2, y: bitmap.pixelsHigh / 2)?
+                .usingColorSpace(.deviceRGB))
+            XCTAssertGreaterThan(center.alphaComponent, 0.5, "\(name.rawValue)")
+            XCTAssertEqual(center.brightnessComponent < 0.5, expectsDarkDot, "\(name.rawValue)")
+        }
+    }
 }
