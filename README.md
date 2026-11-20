@@ -51,7 +51,7 @@ This builds `Breathe-v1.2.0-macos.zip` containing `Breathe.app` with both bundle
 npx wrangler pages deploy site --project-name breathe
 ```
 
-The buy button stays disabled until the `data-checkout` link in `site/index.html` gets a checkout URL.
+The buy button is a disabled placeholder. To open checkout, edit the `data-checkout` link in `site/index.html`: add `href="<checkout URL>"`, remove `is-pending`, `aria-disabled` and `role`, and delete the `data-checkout-note` line.
 
 ### auto-launch on login
 
