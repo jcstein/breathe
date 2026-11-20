@@ -4,6 +4,7 @@ import Combine
 class StatusBarView: NSView {
     private let engine: BreathEngine
     private var cancellables = Set<AnyCancellable>()
+    private var drawnAlphaStep: Int?
 
     var onClick: (() -> Void)?
     var onRightClick: (() -> Void)?
@@ -12,17 +13,29 @@ class StatusBarView: NSView {
         self.engine = engine
         super.init(frame: NSRect(x: 0, y: 0, width: 28, height: 22))
 
+        // @Published emits before storing the new value, so read the engine once the tick is done.
         engine.$elapsed
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.needsDisplay = true
+                guard let self, self.alphaStep != self.drawnAlphaStep else { return }
+                self.needsDisplay = true
             }
             .store(in: &cancellables)
     }
 
     required init?(coder: NSCoder) { fatalError() }
 
+    private var breathingAlpha: CGFloat { 0.5 + 0.5 * CGFloat(engine.expansion) }
+
+    /// The breathing dot's alpha in 8-bit steps, the finest change the menu bar shows; nil when idle.
+    /// Its radius moves less than a pixel per step, so ticks that keep the step skip the redraw.
+    private var alphaStep: Int? {
+        engine.isBreathing ? Int((breathingAlpha * 255).rounded()) : nil
+    }
+
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
+        drawnAlphaStep = alphaStep
 
         guard let ctx = NSGraphicsContext.current?.cgContext else { return }
         let bounds = self.bounds
@@ -38,7 +51,7 @@ class StatusBarView: NSView {
             let maxRadius: CGFloat = 9.0
             let exp = CGFloat(engine.expansion)
             let radius = minRadius + (maxRadius - minRadius) * exp
-            let alpha = 0.5 + 0.5 * exp
+            let alpha = breathingAlpha
 
             // Glow
             let glowRadius = radius * 1.6

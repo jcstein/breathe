@@ -43,4 +43,48 @@ final class StatusBarViewTests: XCTestCase {
             XCTAssertEqual(center.brightnessComponent < 0.5, expectsDarkDot, "\(name.rawValue)")
         }
     }
+
+    func testRedrawsOnlyWhenTheDotAlphaStepChanges() throws {
+        _ = NSApplication.shared
+        var time = 0.0
+        let engine = BreathEngine(now: { time })
+        let view = RedrawCountingView(engine: engine)
+        let bitmap = try XCTUnwrap(view.bitmapImageRepForCachingDisplay(in: view.bounds))
+
+        func redraws(after change: () -> Void) -> Bool {
+            let requests = view.redrawRequests
+            change()
+            let deadline = Date(timeIntervalSinceNow: 0.002)
+            while Date() < deadline {
+                RunLoop.current.run(mode: .eventTracking, before: deadline)
+            }
+            guard view.redrawRequests > requests else { return false }
+            view.cacheDisplay(in: view.bounds, to: bitmap)
+            return true
+        }
+
+        XCTAssertTrue(redraws(after: engine.start))
+        defer { engine.stop() }
+
+        var redrawCount = 0
+        for tick in 1...660 where redraws(after: { time = Double(tick) / 60; engine.update() }) {
+            redrawCount += 1
+        }
+        // One 11 s cycle moves the alpha from 128/255 up to 255 and back: 254 steps in 660 ticks.
+        XCTAssertEqual(redrawCount, 254)
+
+        XCTAssertTrue(redraws(after: engine.stop))
+    }
+}
+
+private final class RedrawCountingView: StatusBarView {
+    var redrawRequests = 0
+
+    override var needsDisplay: Bool {
+        get { super.needsDisplay }
+        set {
+            if newValue { redrawRequests += 1 }
+            super.needsDisplay = newValue
+        }
+    }
 }
