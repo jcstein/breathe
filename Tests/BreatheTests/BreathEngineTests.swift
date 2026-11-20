@@ -17,6 +17,20 @@ final class BreathEngineTests: XCTestCase {
         XCTAssertGreaterThan(engine.elapsed, 0)
     }
 
+    func testStopReportsSessionLengthOnce() {
+        var time = 10.0
+        let engine = BreathEngine(now: { time })
+        var reported: [TimeInterval] = []
+        engine.onSessionEnd = { reported.append($0) }
+        engine.stop()
+        XCTAssertEqual(reported, [])
+        engine.start()
+        time = 72.5
+        engine.stop()
+        engine.stop()
+        XCTAssertEqual(reported, [62.5])
+    }
+
     func testIdleAndStoppedUpdatesDoNothing() {
         var time = 0.0
         let engine = BreathEngine(now: { time })

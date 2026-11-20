@@ -17,6 +17,9 @@ class BreathEngine: ObservableObject {
     @Published var cycleCount: Int = 0
     @Published var isBreathing: Bool = false
 
+    /// Called with the session's length whenever a running session stops.
+    var onSessionEnd: ((TimeInterval) -> Void)?
+
     private var timer: Timer?
     private let now: () -> TimeInterval
     private var sessionStart: TimeInterval?
@@ -61,6 +64,7 @@ class BreathEngine: ObservableObject {
     }
 
     func stop() {
+        if let sessionStart { onSessionEnd?(max(now() - sessionStart, 0)) }
         sessionStart = nil
         isBreathing = false
         phase = .idle

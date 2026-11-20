@@ -14,9 +14,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     var statusItem: NSStatusItem!
     var popover: NSPopover!
     let engine = BreathEngine()
+    let stats = UsageStats()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        engine.onSessionEnd = { [stats] in stats.record(sessionDuration: $0) }
 
         statusItem = NSStatusBar.system.statusItem(withLength: 28)
         statusItem.button?.target = self
@@ -47,7 +49,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         if popover.isShown {
             popover.performClose(nil)
         } else {
-            let hostingController = NSHostingController(rootView: BreathView(engine: engine))
+            let hostingController = NSHostingController(rootView: BreathView(engine: engine, stats: stats))
             hostingController.sizingOptions = [.preferredContentSize]
             popover.contentViewController = hostingController
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
@@ -55,6 +57,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
             NSApp.activate(ignoringOtherApps: true)
             popover.contentViewController?.view.window?.makeKey()
         }
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        engine.stop()
     }
 
     func popoverDidClose(_ notification: Notification) {
