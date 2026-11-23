@@ -308,4 +308,6 @@ h1 { font-size: clamp(40px, 5.6vw, 64px); font-weight: 700; }
   body { font-size: 17px; }
   .menubar { gap: 12px; font-size: 13px; }
   .menubar-item:nth-of-type(-n + 3) { display: none; }
+  .price-card { padding-inline: 20px; }
+  .button-wide { padding-inline: 16px; }
 }

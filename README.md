@@ -59,7 +59,7 @@ To package locally instead, run `./package.sh 1.2.0` (or `./package.sh` on a tag
 npx wrangler deploy
 ```
 
-The buy button is a disabled placeholder. To open checkout, edit the `data-checkout` link in `site/index.html`: add `href="<checkout URL>"`, remove `is-pending`, `aria-disabled` and `role`, and delete the `data-checkout-note` line.
+The "Coming soon on TestFlight" button is a disabled placeholder. To open it, edit the `data-checkout` link in `site/index.html`: add `href="<TestFlight or checkout URL>"`, set its label, remove `is-pending`, `aria-disabled` and `role`, and delete the `data-checkout-note` line. Then update the other "Coming soon" copy to match: the nav and hero buttons and the `description` and `og:description` meta tags.
 
 ### auto-launch on login
 
